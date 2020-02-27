@@ -195,8 +195,10 @@ INTERVAL signature. (Much of the implementation can be copied from
 MakeInterval above.) **Don't forget to specify the module type.**
 ......................................................................*)
 
-module MakeSafeInterval (Endpoint : ORDERED_TYPE) =
+module MakeSafeInterval (Endpoint : ORDERED_TYPE)
+                      : (INTERVAL with type endpoint = Endpoint.t) =
   struct
+    
     type endpoint = Endpoint.t
 
     type interval =
@@ -241,8 +243,8 @@ MakeSafeInterval functor.
 
 module IntSafeInterval = MakeSafeInterval
                           (struct
-                          type t = int
-                              let compare = compare
+                            type t = int
+                            let compare = compare
                           end) ;;
 
 (* Now, try evaluating the following expression in the REPL:
