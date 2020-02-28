@@ -107,22 +107,22 @@ module MakeStack (Element: SERIALIZE) : (STACK with type element = Element.t) =
     let pop_helper (s : stack) : (element * stack) =
       match s with
       | [] -> raise Empty
-      | hd :: tl -> hd, tl ;;
+      | hd :: tl -> hd, tl
 
     let top (s : stack) : element =
       fst (pop_helper s)
 
     let pop (s : stack) : stack =
-      snd (pop_helper s) ;;
+      snd (pop_helper s)
 
     let map (f : element -> element) (s : stack) : stack =
-      List.map f s ;;
+      List.map f s 
 
     let filter (f : element -> bool) (s : stack) : stack =
-      List.filter f s ;;
+      List.filter f s
 
     let fold_left (f : 'a -> element -> 'a) (init : 'a) (s : stack) : 'a =
-      List.fold_left f init s ;;
+      List.fold_left f init s
 
     let serialize (s : stack) : string =
       let concat x y =
@@ -159,7 +159,7 @@ For this oversimplified serialization function, you may assume that
 the string will be made up of alphanumeric characters only.
 ......................................................................*)
 
-module IntStringSerialize =
+module IntStringSerialize : (SERIALIZE with type t = int * string) =
   struct
     type t = int * string
     let serialize (n, s) =
