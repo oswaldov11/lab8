@@ -159,7 +159,7 @@ For this oversimplified serialization function, you may assume that
 the string will be made up of alphanumeric characters only.
 ......................................................................*)
 
-module IntStringSerialize : (SERIALIZE with type t = int * string) =
+module IntStringSerialize =
   struct
     type t = int * string
     let serialize (n, s) =
