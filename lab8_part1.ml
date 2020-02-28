@@ -121,7 +121,7 @@ module MakeInterval (Endpoint : ORDERED_TYPE) =
       match intvl1, intvl2 with
       | Empty, _ | _, Empty -> Empty
       | Interval (lo1, hi1), Interval (lo2, hi2) ->
-          let (_, lo), (hi, _) = ascending lo1 hi1, ascending lo1 hi1 in
+          let (_, lo), (hi, _) = ascending lo1 lo2, ascending hi1 hi2 in
           create lo hi
     end ;;
 
