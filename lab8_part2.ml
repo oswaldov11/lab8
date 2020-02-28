@@ -167,5 +167,3 @@ module IntStringSerialize : (SERIALIZE with type t = int * string) =
   end ;;
 
 module IntStringStack = MakeStack (IntStringSerialize) ;;
-
-
