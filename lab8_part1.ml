@@ -96,35 +96,33 @@ module MakeInterval (Endpoint : ORDERED_TYPE) =
        `high` inclusive. If `low` is greater than `high`, then the
        interval is empty. *)
     let create (low : Endpoint.t) (high : Endpoint.t) : interval =
-      if compare low high < 0 then Interval (low, high)
-      else Empty
+      if Endpoint.compare low high > 0 then Empty
+      else Interval (low, high)
 
     (* is_empty intvl -- Returns true if and only if `intvl` is
        empty *)
     let is_empty (intvl : interval) : bool =
       match intvl with
       | Empty -> true
-      | Interval (_, _) -> false
+      | Interval _ -> false
 
     (* contains intvl x -- Returns true if and only if the value `x`
        is contained within `intvl` *)
     let contains (intvl : interval) (x : Endpoint.t) : bool =
       match intvl with
       | Empty -> false
-      | Interval (low, high) -> compare x low > 0 && compare x high < 0 
+      | Interval (low, high) -> Endpoint.compare x low >= 0
+                                && Endpoint.compare x high <= 0 
 
     (* intersect intvl1 intvl2 -- Returns the intersection of `intvl1`
        and `intvl2` *)
     let intersect (intvl1 : interval) (intvl2 : interval) : interval =
+      let ascending x y = if Endpoint.compare x y <= 0 then x, y else y, x in
       match intvl1, intvl2 with
-      | Empty, Empty -> Empty
-      | intvl, Empty -> intvl
-      | Empty, intvl -> intvl
-      | Interval (hi1, lo1), Interval (hi2, lo2) ->
-          if contains (Interval (hi2, lo2)) lo1 && contains (Interval (hi2, lo2)) hi1 then create hi1 lo1
-          else if contains (Interval (hi1, lo1)) lo2 && contains (Interval (hi1, lo1)) hi2 then create hi2 lo2
-          else if contains (Interval (hi2, lo2)) lo1 then create hi2 lo1
-          else create hi1 lo2
+      | Empty, _ | _, Empty -> Empty
+      | Interval (lo1, hi1), Interval (lo2, hi2) ->
+          let (_, lo), (hi, _) = ascending lo1 hi1, ascending lo1 hi1 in
+          create lo hi
     end ;;
 
 (*......................................................................
@@ -135,7 +133,7 @@ interval module.
 module IntInterval = MakeInterval
                       (struct
                           type t = int
-                          let compare = compare
+                          let compare = Stdlib.compare
                        end) ;;
 
 (*......................................................................
@@ -195,7 +193,7 @@ INTERVAL signature. (Much of the implementation can be copied from
 MakeInterval above.) **Don't forget to specify the module type.**
 ......................................................................*)
 
-module MakeSafeInterval (Endpoint : ORDERED_TYPE) =
+module MakeSafeInterval (Endpoint : ORDERED_TYPE) : INTERVAL =
   struct
     type endpoint = Endpoint.t
 
@@ -204,29 +202,27 @@ module MakeSafeInterval (Endpoint : ORDERED_TYPE) =
       | Empty
 
     let create (low : endpoint) (high : endpoint) : interval =
-      if compare low high < 0 then Interval (low, high)
-      else Empty
+      if Endpoint.compare low high > 0 then Empty
+      else Interval (low, high)
 
     let is_empty (intvl : interval) : bool =
       match intvl with
       | Empty -> true
-      | Interval (_, _) -> false
+      | Interval _ -> false
 
     let contains (intvl : interval) (x : endpoint) : bool =
       match intvl with
       | Empty -> false
-      | Interval (low, high) -> compare x low > 0 && compare x high < 0 
+      | Interval (low, high) -> Endpoint.compare x low >= 0
+                                && Endpoint.compare x high <= 0 
 
     let intersect (intvl1 : interval) (intvl2 : interval) : interval =
+      let ascending x y = if Endpoint.compare x y <= 0 then x, y else y, x in
       match intvl1, intvl2 with
-      | Empty, Empty -> Empty
-      | intvl, Empty -> intvl
-      | Empty, intvl -> intvl
-      | Interval (hi1, lo1), Interval (hi2, lo2) ->
-          if contains (Interval (hi2, lo2)) lo1 && contains (Interval (hi2, lo2)) hi1 then create hi1 lo1
-          else if contains (Interval (hi1, lo1)) lo2 && contains (Interval (hi1, lo1)) hi2 then create hi2 lo2
-          else if contains (Interval (hi2, lo2)) lo1 then create hi2 lo1
-          else create hi1 lo2
+      | Empty, _ | _, Empty -> Empty
+      | Interval (lo1, hi1), Interval (lo2, hi2) ->
+          let (_, lo), (hi, _) = ascending lo1 hi1, ascending lo1 hi1 in
+          create lo hi
   end ;;
 
 (* We have successfully made our returned module abstract, but believe
@@ -242,7 +238,7 @@ MakeSafeInterval functor.
 module IntSafeInterval = MakeSafeInterval
                           (struct
                             type t = int
-                            let compare = compare
+                            let compare = Stdlib.compare
                           end) ;;
 
 (* Now, try evaluating the following expression in the REPL:
@@ -300,29 +296,27 @@ module MakeBestInterval (Endpoint : ORDERED_TYPE)
       | Empty
 
     let create (low : endpoint) (high : endpoint) : interval =
-      if compare low high < 0 then Interval (low, high)
-      else Empty
+      if Endpoint.compare low high > 0 then Empty
+      else Interval (low, high)
 
     let is_empty (intvl : interval) : bool =
       match intvl with
       | Empty -> true
-      | Interval (_, _) -> false
+      | Interval _ -> false
 
     let contains (intvl : interval) (x : endpoint) : bool =
       match intvl with
       | Empty -> false
-      | Interval (low, high) -> compare x low > 0 && compare x high < 0 
+      | Interval (low, high) -> Endpoint.compare x low >= 0
+                                && Endpoint.compare x high <= 0 
 
     let intersect (intvl1 : interval) (intvl2 : interval) : interval =
+      let ascending x y = if Endpoint.compare x y <= 0 then x, y else y, x in
       match intvl1, intvl2 with
-      | Empty, Empty -> Empty
-      | intvl, Empty -> intvl
-      | Empty, intvl -> intvl
-      | Interval (hi1, lo1), Interval (hi2, lo2) ->
-          if contains (Interval (hi2, lo2)) lo1 && contains (Interval (hi2, lo2)) hi1 then create hi1 lo1
-          else if contains (Interval (hi1, lo1)) lo2 && contains (Interval (hi1, lo1)) hi2 then create hi2 lo2
-          else if contains (Interval (hi2, lo2)) lo1 then create hi2 lo1
-          else create hi1 lo2
+      | Empty, _ | _, Empty -> Empty
+      | Interval (lo1, hi1), Interval (lo2, hi2) ->
+          let (_, lo), (hi, _) = ascending lo1 hi1, ascending lo1 hi1 in
+          create lo hi
   end ;;
 
 (* We now have a fully functioning functor that can create interval
@@ -348,5 +342,5 @@ instead?
 module IntBestInterval = MakeBestInterval
                           (struct
                             type t = int
-                            let compare = compare
+                            let compare = Stdlib.compare
                           end) ;;
