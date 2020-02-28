@@ -163,7 +163,7 @@ module IntStringSerialize : (SERIALIZE with type t = int * string) =
   struct
     type t = int * string
     let serialize (n, s) =
-      "(" ^ string_of_int n ^ ", '" ^ s ^ "')"
+      "(" ^ string_of_int n ^ ",'" ^ s ^ "')"
   end ;;
 
 module IntStringStack = MakeStack (IntStringSerialize) ;;
